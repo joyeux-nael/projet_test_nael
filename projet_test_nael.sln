@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "projet_test_nael", "projet_test_nael\projet_test_nael.csproj", "{7E863D1F-144A-4F80-8908-FBD57078B5AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "projet_test_nael", "projet_test_nael\projet_test_nael.csproj", "{7E863D1F-144A-4F80-8908-FBD57078B5AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestApi_test_nael", "RestApi_test_nael\RestApi_test_nael.csproj", "{4A0DD157-4611-4ABF-BAF1-C950FC494D8D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "projet_test_nael_data", "projet_test_nael_data\projet_test_nael_data.csproj", "{43D143DF-1A5D-408F-A5B2-E60B70D61611}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{7E863D1F-144A-4F80-8908-FBD57078B5AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E863D1F-144A-4F80-8908-FBD57078B5AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E863D1F-144A-4F80-8908-FBD57078B5AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A0DD157-4611-4ABF-BAF1-C950FC494D8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A0DD157-4611-4ABF-BAF1-C950FC494D8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A0DD157-4611-4ABF-BAF1-C950FC494D8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A0DD157-4611-4ABF-BAF1-C950FC494D8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43D143DF-1A5D-408F-A5B2-E60B70D61611}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43D143DF-1A5D-408F-A5B2-E60B70D61611}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43D143DF-1A5D-408F-A5B2-E60B70D61611}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43D143DF-1A5D-408F-A5B2-E60B70D61611}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
