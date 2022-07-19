@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text;
+using System.Text.Json;
 using projet_test_nael;
 using projet_test_nael.Models;
 
@@ -6,7 +8,8 @@ using projet_test_nael.Models;
 // See https://aka.ms/new-console-template for more information
 Console.WriteLine("Hello, World!");
 
-//HttpClient client = new HttpClient();
+HttpClient client = new HttpClient();
+JsonSerializerOptions jsonOptions = new(JsonSerializerDefaults.Web);
 
 //client.SendAsync();
 
@@ -23,7 +26,7 @@ switch (act)
         Insere_Bdd();
         break;
     case "G":
-        Get_Bdd();
+        await Get_Bdd();
         break;
     case "U":
         Update_Bdd();
@@ -33,32 +36,19 @@ switch (act)
 }
 
 
-
-/*using (var ctx = new MyDbContext())
+void Insere_Bdd()
 {
-    Text? text = ctx.Set<Text>().Find(1);
-
-    var query = ctx.Texts.ToList();
-
-    if (text == null)
+    var toInsert = new Text
     {
-        Console.WriteLine("Text not found");
-        return;
-    }
+        Content = "To insert"
+    };
 
-    text.Content = "Hello, World! From Nael";
+    HttpRequestMessage requestTest = new(HttpMethod.Post, "url_here");
 
-    //Console.WriteLine($"t id: {t.Id}");
+    string json = JsonSerializer.Serialize(toInsert, jsonOptions);
 
-    //ctx.Texts.Add(t);
+    requestTest.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-    ctx.SaveChanges();
-
-    //Console.WriteLine($"t id: {t.Id}");
-}*/
-
-static void Insere_Bdd()
-{
     using (var ctx = new MyDbContext())
     {
         Console.WriteLine("Ecrire le texte à insérer:");
@@ -67,6 +57,7 @@ static void Insere_Bdd()
 
         Console.WriteLine($"t id: {t.Id}");
 
+        var restApi = new HttpClient();
         ctx.Texts.Add(t);
 
         ctx.SaveChanges();
@@ -77,26 +68,32 @@ static void Insere_Bdd()
     }
 }
 
-static void Get_Bdd()
+async Task Get_Bdd()
 {
     using (var ctx = new MyDbContext())
     {
         Console.WriteLine("Donner l'Id du texte à visualiser:");
-        string? i1 = Console.ReadLine();
-        if (i1 == null)
+        string? id = Console.ReadLine();
+        if (id == null)
         {
             Console.WriteLine("No Id.");
             return;
         }
-        int i2 = int.Parse(i1);
-        Text? text = ctx.Set<Text>().Find(i2);
+
+        string addr = $"https://localhost:7283/Text/api/Text/{id}";
+
+        using var stream = await sendGetRequest(addr).Content.ReadAsStreamAsync(CancellationToken.None);
+
+        Text? text = await JsonSerializer.DeserializeAsync<Text>(stream, jsonOptions, CancellationToken.None);
+
         if (text == null)
         {
-            Console.WriteLine("Text not found");
+            Console.WriteLine("text is null");
             return;
         }
+
         Console.WriteLine("Texte correspondant à l'Id:");
-        Console.WriteLine("- - "+text.Content+" - -");
+        Console.WriteLine("- - " + text.Content + " - -");
     }
 }
 
@@ -106,21 +103,51 @@ static void Update_Bdd()
     {
         Console.WriteLine("Donner l'Id du texte à modifier:");
         string? i1 = Console.ReadLine();
+
         if (i1 == null)
         {
             Console.WriteLine("No Id.");
             return;
         }
+
         int i2 = int.Parse(i1);
         Text? text = ctx.Set<Text>().Find(i2);
+
         if (text == null)
         {
             Console.WriteLine("Text not found");
             return;
         }
+
         Console.WriteLine("Nouveau texte:");
         text.Content = Console.ReadLine();
         ctx.SaveChanges();
         Console.WriteLine("Texte modifié!");
     }
+}
+
+HttpResponseMessage? sendGetRequest(string? addr)
+{
+    //https://localhost:7283/Text/api/Text/
+    Uri uri = new($"{addr}");
+
+    HttpRequestMessage request = new(HttpMethod.Get, uri);
+
+    var response =  client.Send(request, CancellationToken.None);
+
+    response.EnsureSuccessStatusCode();
+    return response;   
+}
+
+HttpResponseMessage? sendPostRequest(string? addr)
+{
+    //https://localhost:7283/Text/api/Text/
+    Uri uri = new($"{addr}");
+
+    HttpRequestMessage request = new(HttpMethod.Post, uri);
+
+    var response = client.Send(request, CancellationToken.None);
+
+    response.EnsureSuccessStatusCode();
+    return response;
 }
