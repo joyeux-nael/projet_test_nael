@@ -19,7 +19,7 @@ namespace RestApi_test_nael.Controllers
 
         [HttpGet]
         [Route("api/[controller]/{id}")]
-        public async Task<ActionResult<Text?>> GeById(int id, CancellationToken cancellationToken)
+        public async Task<ActionResult<Text?>> GetById(int id, CancellationToken cancellationToken)
         {
             var text = await _context.Texts.FindAsync(new object?[] { id }, cancellationToken: cancellationToken);
 
@@ -34,10 +34,14 @@ namespace RestApi_test_nael.Controllers
 
         [HttpPost]
         [Route("api/[controller]")]
-        public string Add([FromBody] Text toInsert)
+        public async Task<ActionResult<Text?>> Add(Text text, CancellationToken cancellationToken)
         {
-            return string.Empty;
-            //return "Sent text: " + text;
+            //return string.Empty;
+
+            _context.Texts.Add(text);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return Ok(text);
         }
 
         //[HttpPost]
@@ -47,12 +51,21 @@ namespace RestApi_test_nael.Controllers
         //    return "Sent text: " + text;
         //}
 
-        //[HttpPut]
-        //[Route("api/[controller]/UpdateText")]
-        //public string Update(string text)
-        //{
-        //    return "Sent text: " + text;
-        //}
+        [HttpPut]
+        [Route("api/[controller]/updatetext")]
+        public async Task<ActionResult<Text?>> update(int id, string newText, CancellationToken cancellationToken)
+        {
+            var text = await _context.Texts.FindAsync(new object?[] { id }, cancellationToken: cancellationToken);
+
+            text.Content = newText;
+            if (text == null)
+            {
+                return NotFound("Text not found");
+            }
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return Ok(text);
+        }
 
         //[HttpGet]
         //[Route("api/[controller]/GetWeatherForecast")]
@@ -66,12 +79,5 @@ namespace RestApi_test_nael.Controllers
         //    })
         //    .ToArray();
         //}
-
-        [HttpGet]
-        [Route("api/[controller]/GetHelloWorld")]
-        public string GetHelloWorld()
-        {
-            return "hello world";
-        }
     }
 }

@@ -38,17 +38,6 @@ switch (act)
 
 void Insere_Bdd()
 {
-    var toInsert = new Text
-    {
-        Content = "To insert"
-    };
-
-    HttpRequestMessage requestTest = new(HttpMethod.Post, "url_here");
-
-    string json = JsonSerializer.Serialize(toInsert, jsonOptions);
-
-    requestTest.Content = new StringContent(json, Encoding.UTF8, "application/json");
-
     using (var ctx = new MyDbContext())
     {
         Console.WriteLine("Ecrire le texte à insérer:");
@@ -58,9 +47,7 @@ void Insere_Bdd()
         Console.WriteLine($"t id: {t.Id}");
 
         var restApi = new HttpClient();
-        ctx.Texts.Add(t);
-
-        ctx.SaveChanges();
+        sendPostRequest(t);
 
         Console.WriteLine($"t id: {t.Id}");
         Console.WriteLine("Sauvegarde du texte:");
@@ -70,8 +57,8 @@ void Insere_Bdd()
 
 async Task Get_Bdd()
 {
-    using (var ctx = new MyDbContext())
-    {
+    //using (var ctx = new MyDbContext())
+    //{
         Console.WriteLine("Donner l'Id du texte à visualiser:");
         string? id = Console.ReadLine();
         if (id == null)
@@ -94,41 +81,35 @@ async Task Get_Bdd()
 
         Console.WriteLine("Texte correspondant à l'Id:");
         Console.WriteLine("- - " + text.Content + " - -");
-    }
+    //}
 }
 
-static void Update_Bdd()
+void Update_Bdd()
 {
     using (var ctx = new MyDbContext())
     {
         Console.WriteLine("Donner l'Id du texte à modifier:");
-        string? i1 = Console.ReadLine();
-
-        if (i1 == null)
+        string? id = Console.ReadLine();
+        if (id == null)
         {
             Console.WriteLine("No Id.");
             return;
         }
+        string addr = $"https://localhost:7283/Text/api/Text/{id}";
 
-        int i2 = int.Parse(i1);
-        Text? text = ctx.Set<Text>().Find(i2);
+        Console.WriteLine("Ecrire le nouveau texte:");
+        string newText = Console.ReadLine();
 
-        if (text == null)
-        {
-            Console.WriteLine("Text not found");
-            return;
-        }
 
-        Console.WriteLine("Nouveau texte:");
-        text.Content = Console.ReadLine();
-        ctx.SaveChanges();
+        var restApi = new HttpClient();
+        sendPutRequest(addr, newText);
+
         Console.WriteLine("Texte modifié!");
     }
 }
 
 HttpResponseMessage? sendGetRequest(string? addr)
 {
-    //https://localhost:7283/Text/api/Text/
     Uri uri = new($"{addr}");
 
     HttpRequestMessage request = new(HttpMethod.Get, uri);
@@ -139,15 +120,46 @@ HttpResponseMessage? sendGetRequest(string? addr)
     return response;   
 }
 
-HttpResponseMessage? sendPostRequest(string? addr)
+async Task sendPostRequest(Text? toInsert)
 {
-    //https://localhost:7283/Text/api/Text/
-    Uri uri = new($"{addr}");
+    //try
+    //{
+        Uri uri = new("https://localhost:7283/Text/api/Text");
+        HttpRequestMessage requestTest = new(HttpMethod.Post, uri);
 
-    HttpRequestMessage request = new(HttpMethod.Post, uri);
+        string json = JsonSerializer.Serialize(toInsert, jsonOptions);
 
-    var response = client.Send(request, CancellationToken.None);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-    response.EnsureSuccessStatusCode();
-    return response;
+        var response = await client.PostAsync(uri, content, CancellationToken.None);
+
+        response.EnsureSuccessStatusCode();
+    //}
+    //catch (Exception ex)
+    //{
+    //    Console.WriteLine(ex.ToString());
+    //    throw;
+    //}
+}
+
+async Task sendPutRequest(string addr, string toInsert)
+{
+    try
+    {
+        Uri uri = new(addr);
+        HttpRequestMessage requestTest = new(HttpMethod.Post, uri);
+
+        string json = JsonSerializer.Serialize(toInsert, jsonOptions);
+
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await client.PutAsync(uri, content, CancellationToken.None);
+
+        response.EnsureSuccessStatusCode();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.ToString());
+        throw;
+    }
 }
